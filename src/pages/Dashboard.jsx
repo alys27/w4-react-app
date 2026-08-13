@@ -6,7 +6,7 @@ import TaskForm from "../components/TaskForm";
 function Dashboard() {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const { state } = useTasks();
+  const { state, deleteTask, toggleTask } = useTasks();
 
   const handleLogout = () => {
     logout();
@@ -24,7 +24,18 @@ function Dashboard() {
 
       <ul>
         {state.tasks.map((task) => (
-          <li key={task.id}>{task.title}</li>
+          <li key={task.id}>
+            <span
+              style={{
+                textDecoration: task.completed ? "line-through" : "none",
+                cursor: "pointer",
+              }}
+              onClick={() => toggleTask(task)}
+            >
+              {task.title}
+            </span>
+            <button onClick={() => deleteTask(task.id)}>Delete</button>
+          </li>
         ))}
       </ul>
     </div>

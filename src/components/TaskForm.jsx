@@ -4,28 +4,22 @@ import { useTasks } from "../context/TaskContext";
 function TaskForm() {
   const [title, setTitle] = useState("");
   const [error, setError] = useState("");
-  const { dispatch } = useTasks();
+  const { addTask } = useTasks();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const trimmedTitle = title.trim();
 
     if (!trimmedTitle) {
       setError("Task title cannot be empty");
       return;
     }
-
     if (trimmedTitle.length < 3) {
       setError("Task title must be at least 3 characters");
       return;
     }
 
-    dispatch({
-      type: "ADD_TASK",
-      payload: { id: Date.now(), title: trimmedTitle, completed: false },
-    });
-
+    addTask(trimmedTitle);
     setTitle("");
     setError("");
   };
