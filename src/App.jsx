@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import { TaskProvider } from "./context/TaskContext";
+import { AuthProvider } from "./features/auth/AuthContext";
+import { TaskProvider } from "./features/tasks/TaskContext";
+import Login from "./features/auth/Login";
+import Dashboard from "./features/tasks/Dashboard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {

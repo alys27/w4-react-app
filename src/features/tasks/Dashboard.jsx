@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useTasks } from "../context/TaskContext";
-import TaskForm from "../components/TaskForm";
+import { useAuth } from "../auth/AuthContext";
+import { useTasks } from "./TaskContext";
+import TaskForm from "./TaskForm";
 
 function Dashboard() {
   const { logout } = useAuth();
