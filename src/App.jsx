@@ -4,6 +4,7 @@ import { TaskProvider } from "./context/TaskContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
   return (
@@ -17,7 +18,9 @@ function App() {
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <ErrorBoundary>
+                    <Dashboard />
+                  </ErrorBoundary>
                 </ProtectedRoute>
               }
             />
