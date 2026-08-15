@@ -25,7 +25,7 @@ function TaskForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="task-form">
       <input
         type="text"
         placeholder="Enter task title"
@@ -35,8 +35,10 @@ function TaskForm() {
           if (error) setError("");
         }}
       />
-      <button type="submit">Add Task</button>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      <button type="submit" className="btn-primary" style={{ width: "auto" }}>
+        Add
+      </button>
+      {error && <p className="error-text">{error}</p>}
     </form>
   );
 }

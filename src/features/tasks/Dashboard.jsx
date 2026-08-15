@@ -15,32 +15,33 @@ function Dashboard() {
   };
 
   return (
-    <div>
-      <h1>Dashboard (Protected)</h1>
-      <button onClick={handleLogout}>Logout</button>
-
-      <hr />
+  <div className="dashboard-page">
+    <div className="dashboard-container">
+      <div className="dashboard-header">
+        <h1>My Tasks</h1>
+        <button onClick={handleLogout} className="btn-secondary">Logout</button>
+      </div>
 
       <TaskForm />
 
-      <ul>
+      <ul className="task-list">
         {state.tasks.map((task) => (
-          <li key={task.id}>
+          <li key={task.id} className="task-item">
             <span
-              style={{
-                textDecoration: task.completed ? "line-through" : "none",
-                cursor: "pointer",
-              }}
+              className={`task-title ${task.completed ? "completed" : ""}`}
               onClick={() => toggleTask(task)}
             >
               {task.title}
             </span>
-            <button onClick={() => deleteTask(task.id)}>Delete</button>
+            <button onClick={() => deleteTask(task.id)} className="btn-delete">
+              Delete
+            </button>
           </li>
         ))}
       </ul>
     </div>
-  );
+  </div>
+);
 }
 
 export default Dashboard;

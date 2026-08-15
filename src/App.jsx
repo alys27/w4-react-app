@@ -5,6 +5,7 @@ import Login from "./features/auth/Login";
 import Dashboard from "./features/tasks/Dashboard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
+import "./App.css";
 
 function App() {
   return (
