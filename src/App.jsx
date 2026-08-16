@@ -5,7 +5,7 @@ import Login from "./features/auth/Login";
 import Dashboard from "./features/tasks/Dashboard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
-
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -25,6 +25,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TaskProvider>
