@@ -95,8 +95,26 @@ export function TaskProvider({ children }) {
     }
   };
 
+  const updateTaskTitle = async (task, newTitle) => {
+    const updatedTask = { ...task, title: newTitle };
+    dispatch({ type: "UPDATE_TASK", payload: updatedTask });
+
+    try {
+      await fetch(`${API_URL}/${task.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedTask),
+      });
+    } catch (err) {
+      dispatch({ type: "UPDATE_TASK", payload: task });
+      console.error("Failed to update task title:", err);
+    }
+  };
+
   return (
-    <TaskContext.Provider value={{ state, addTask, deleteTask, toggleTask }}>
+    <TaskContext.Provider
+      value={{ state, addTask, deleteTask, toggleTask, updateTaskTitle }}
+    >
       {children}
     </TaskContext.Provider>
   );
