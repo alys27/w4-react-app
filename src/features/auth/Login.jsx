@@ -9,11 +9,25 @@ function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const MOCK_USERS = [
+  { username: "admin", password: "admin123" },
+  { username: "test", password: "test1234" },
+];
+
+const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!username || !password) {
       setError("Please fill in both fields");
+      return;
+    }
+
+    const foundUser = MOCK_USERS.find(
+      (u) => u.username === username && u.password === password
+    );
+
+    if (!foundUser) {
+      setError("Invalid username or password");
       return;
     }
 
