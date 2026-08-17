@@ -13,19 +13,21 @@ Mock autentifikasiya (login/logout), qorunan marşrutlar (protected routes), qlo
 
 - React 18 (Vite)
 - React Router DOM — marşrutlaşdırma və qorunan səhifələr
-- Context API + useReducer — qlobal state idarəetməsi
+- Context API + useReducer — həm task, həm də auth state-inin mərkəzləşdirilmiş idarəetməsi
 - json-server — mock REST API
 - Vanilla CSS — özəl dizayn
 
 ## 📁 Layihə strukturu
+
 ```
 src/
 ├── features/
 │ ├── auth/
-│ │ ├── AuthContext.jsx # autentifikasiya state-i (login/logout/token)
+│ │ ├── AuthContext.jsx # autentifikasiya state-i (useReducer: LOGIN/LOGOUT, token expiration)
 │ │ └── Login.jsx # login forması
 │ └── tasks/
-│ ├── TaskContext.jsx # task-ların CRUD məntiqi (optimistic UI ilə)
+│ ├── TaskContext.jsx # task-ların reducer məntiqi və optimistic UI orkestrasiyası
+│ ├── taskApi.js # mock API ilə bütün fetch sorğuları (CRUD)
 │ ├── TaskForm.jsx # yeni task əlavə etmə forması
 │ └── Dashboard.jsx # qorunan əsas səhifə
 ├── components/
@@ -37,7 +39,7 @@ src/
 
 ## ⚙️ Quraşdırma və işə salma
 
-```bash
+```
 # 1. Repo-nu klonla
 git clone https://github.com/alys27/w4-react-app.git
 cd w4-react-app
@@ -56,8 +58,6 @@ Tətbiq `http://localhost:5173` ünvanında açılacaq, mock API isə `http://lo
 
 ## ✅ Əsas funksionallıq və development qeydləri
 
-Layihə checkpoint-lər üzrə addım-addım, ardıcıl commit-lərlə qurulub: əvvəlcə React Router ilə qorunan marşrutlar quruldu — login olmadan `/dashboard`-a giriş cəhdi avtomatik `/login`-ə yönləndirilir. Ardından autentifikasiya axını əlavə olundu: login/logout, token `localStorage`-da saxlanılır ki, səhifə yenilənəndə istifadəçi sessiyadan çıxarılmasın, logout-dan sonra isə "Geri" düyməsi ilə qorunan səhifəyə qayıtmaq mümkün deyil.
+Layihə checkpoint-lər üzrə addım-addım, ardıcıl commit-lərlə qurulub: əvvəlcə React Router ilə qorunan marşrutlar quruldu — login olmadan `/dashboard`-a giriş cəhdi avtomatik `/login`-ə yönləndirilir. Ardından autentifikasiya axını əlavə olundu: login/logout, token `localStorage`-da saxlanılır ki, səhifə yenilənəndə istifadəçi sessiyadan çıxarılmasın, logout-dan sonra isə "Geri" düyməsi ilə qorunan səhifəyə qayıtmaq mümkün deyil. AuthContext daxilində mock token expiration (2 dəqiqə) taymeri quruldu — vaxt bitdikdə istifadəçi avtomatik logout edilir və `/login`-ə yönləndirilir; guest guard isə giriş etmiş istifadəçinin `/login`-ə təkrar keçməsinin qarşısını alır.
 
-Növbəti mərhələdə `useReducer` ilə qlobal state idarəetməsi quruldu, üzərinə forma validasiyası (boş və ya çox qısa başlıqların qəbul edilməməsi) əlavə olundu. CRUD əməliyyatları (əlavə/yenilə/sil) **optimistic UI** məntiqi ilə `json-server` mock API-yə bağlandı — hər əməliyyat serverə sorğu tamamlanmadan UI-da dərhal əks olunur, sorğu uğursuz olduqda isə avtomatik geri qaytarılır (rollback).
-
-Son mərhələdə Dashboard-u əhatə edən Error Boundary əlavə olundu ki, testlənən komponentdə baş verən gözlənilməz xəta bütün tətbiqi çökdürməsin, və layihə fayl strukturu type-based-dən feature-based formata keçirildi (`features/auth`, `features/tasks`) ki, əlaqəli fayllar bir yerdə cəmlənsin.
+Növbəti mərhələdə `useReducer` ilə qlobal state idarəetməsi quruldu, üzərinə forma validasiyası (boş və ya çox qısa başlıqların qəbul edilməməsi) əlavə olundu. CRUD əməliyyatları (əlavə/yenilə/sil) **optimistic UI** məntiqi ilə `json-server` mock API-yə bağlandı — hər əməliyyat serverə sorğu tamamlanmadan UI-da dərhal əks olunur, sorğu uğursuz olduqda isə avtomatik geri qaytarılır (rollback). Mentor rəyinə əsasən, API sorğuları (`fetch`) `TaskContext`-dən ayrılaraq ayrıca `taskApi.js` faylına

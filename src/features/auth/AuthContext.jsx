@@ -1,57 +1,68 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useReducer, useEffect } from "react";
 
 const AuthContext = createContext(null);
-const TOKEN_TTL = 2 * 60 * 1000; // 2 dəqiqə — demo/test üçün qısa saxlanılıb
+const TOKEN_TTL = 2 * 60 * 1000;
+
+function getStoredSession() {
+  const savedToken = localStorage.getItem("token");
+  const expiresAt = localStorage.getItem("expiresAt");
+  if (savedToken && expiresAt && Date.now() < Number(expiresAt)) {
+    return { token: savedToken, expiresAt: Number(expiresAt) };
+  }
+  localStorage.removeItem("token");
+  localStorage.removeItem("expiresAt");
+  return { token: null, expiresAt: null };
+}
+
+function authReducer(state, action) {
+  switch (action.type) {
+    case "LOGIN":
+      return { token: action.payload.token, expiresAt: action.payload.expiresAt };
+    case "LOGOUT":
+      return { token: null, expiresAt: null };
+    default:
+      return state;
+  }
+}
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => {
-    const savedToken = localStorage.getItem("token");
-    const expiresAt = localStorage.getItem("expiresAt");
-    if (savedToken && expiresAt && Date.now() < Number(expiresAt)) {
-      return savedToken;
-    }
-    localStorage.removeItem("token");
-    localStorage.removeItem("expiresAt");
-    return null;
-  });
+  const [state, dispatch] = useReducer(authReducer, null, getStoredSession);
 
   const login = (newToken) => {
     const expiresAt = Date.now() + TOKEN_TTL;
     localStorage.setItem("token", newToken);
     localStorage.setItem("expiresAt", String(expiresAt));
-    setToken(newToken);
+    dispatch({ type: "LOGIN", payload: { token: newToken, expiresAt } });
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("expiresAt");
-    setToken(null);
+    dispatch({ type: "LOGOUT" });
   };
 
-  const isExpired = () => {
-    const expiresAt = Number(localStorage.getItem("expiresAt"));
-    return !expiresAt || Date.now() >= expiresAt;
-  };
+  const isExpired = () => !state.expiresAt || Date.now() >= state.expiresAt;
 
   useEffect(() => {
-    if (!token) return;
+    if (!state.token) return;
 
-    const expiresAt = Number(localStorage.getItem("expiresAt"));
-    const timeLeft = expiresAt - Date.now();
-
+    const timeLeft = state.expiresAt - Date.now();
     if (timeLeft <= 0) {
       logout();
       return;
     }
 
-    const timer = setTimeout(() => {
-      logout();
-    }, timeLeft);
-
+    const timer = setTimeout(() => logout(), timeLeft);
     return () => clearTimeout(timer);
-  }, [token]);
+  }, [state.token, state.expiresAt]);
 
-  const value = { token, isAuthenticated: !!token, login, logout, isExpired };
+  const value = {
+    token: state.token,
+    isAuthenticated: !!state.token,
+    login,
+    logout,
+    isExpired,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

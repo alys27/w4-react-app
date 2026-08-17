@@ -1,8 +1,8 @@
 import { createContext, useContext, useReducer, useEffect } from "react";
 import { useAuth } from "../auth/AuthContext";
+import { fetchTasks, createTask, deleteTaskRequest, updateTaskRequest } from "./taskApi";
 
 const TaskContext = createContext(null);
-const API_URL = "http://localhost:3001/tasks";
 
 const initialState = {
   tasks: [],
@@ -13,10 +13,8 @@ function taskReducer(state, action) {
   switch (action.type) {
     case "SET_TASKS":
       return { ...state, tasks: action.payload };
-
     case "ADD_TASK":
       return { ...state, tasks: [...state.tasks, action.payload] };
-
     case "UPDATE_TASK":
       return {
         ...state,
@@ -24,13 +22,11 @@ function taskReducer(state, action) {
           task.id === action.payload.id ? action.payload : task
         ),
       };
-
     case "DELETE_TASK":
       return {
         ...state,
         tasks: state.tasks.filter((task) => task.id !== action.payload),
       };
-
     default:
       return state;
   }
@@ -38,7 +34,6 @@ function taskReducer(state, action) {
 
 export function TaskProvider({ children }) {
   const [state, dispatch] = useReducer(taskReducer, initialState);
-
   const { isExpired, logout } = useAuth();
 
   const checkAuthOrFail = () => {
@@ -49,8 +44,7 @@ export function TaskProvider({ children }) {
   };
 
   useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json())
+    fetchTasks()
       .then((data) => dispatch({ type: "SET_TASKS", payload: data }))
       .catch((err) => console.error("Failed to fetch tasks:", err));
   }, []);
@@ -58,18 +52,11 @@ export function TaskProvider({ children }) {
   const addTask = async (title) => {
     const tempId = "temp-" + Date.now();
     const optimisticTask = { id: tempId, title, completed: false };
-
     dispatch({ type: "ADD_TASK", payload: optimisticTask });
 
     try {
       checkAuthOrFail();
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, completed: false }),
-      });
-      const savedTask = await res.json();
-
+      const savedTask = await createTask({ title, completed: false });
       dispatch({ type: "DELETE_TASK", payload: tempId });
       dispatch({ type: "ADD_TASK", payload: savedTask });
     } catch (err) {
@@ -84,7 +71,7 @@ export function TaskProvider({ children }) {
 
     try {
       checkAuthOrFail();
-      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      await deleteTaskRequest(id);
     } catch (err) {
       dispatch({ type: "ADD_TASK", payload: taskToDelete });
       console.error("Failed to delete task:", err);
@@ -97,11 +84,7 @@ export function TaskProvider({ children }) {
 
     try {
       checkAuthOrFail();
-      await fetch(`${API_URL}/${task.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedTask),
-      });
+      await updateTaskRequest(updatedTask);
     } catch (err) {
       dispatch({ type: "UPDATE_TASK", payload: task });
       console.error("Failed to update task:", err);
@@ -114,11 +97,7 @@ export function TaskProvider({ children }) {
 
     try {
       checkAuthOrFail();
-      await fetch(`${API_URL}/${task.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedTask),
-      });
+      await updateTaskRequest(updatedTask);
     } catch (err) {
       dispatch({ type: "UPDATE_TASK", payload: task });
       console.error("Failed to update task title:", err);
