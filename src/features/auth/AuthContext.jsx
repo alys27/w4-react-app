@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext(null);
-const TOKEN_TTL = 15 * 60 * 1000; // 15 dəqiqə
+const TOKEN_TTL = 2 * 60 * 1000; // 2 dəqiqə — demo/test üçün qısa saxlanılıb
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => {
@@ -28,6 +28,11 @@ export function AuthProvider({ children }) {
     setToken(null);
   };
 
+  const isExpired = () => {
+    const expiresAt = Number(localStorage.getItem("expiresAt"));
+    return !expiresAt || Date.now() >= expiresAt;
+  };
+
   useEffect(() => {
     if (!token) return;
 
@@ -46,7 +51,7 @@ export function AuthProvider({ children }) {
     return () => clearTimeout(timer);
   }, [token]);
 
-  const value = { token, isAuthenticated: !!token, login, logout };
+  const value = { token, isAuthenticated: !!token, login, logout, isExpired };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

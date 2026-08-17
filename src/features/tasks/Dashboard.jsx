@@ -11,6 +11,9 @@ function Dashboard() {
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState("");
 
+  const [crash, setCrash] = useState(false);
+    if (crash) throw new Error("Simulated crash for testing Error Boundary");
+
   const handleLogout = () => {
     logout();
     navigate("/login", { replace: true });
@@ -35,6 +38,10 @@ function Dashboard() {
           <h1>My Tasks</h1>
           <button onClick={handleLogout} className="btn-secondary">
             Logout
+          </button>
+
+          <button onClick={() => setCrash(true)} className="btn-secondary">
+            Simulate Crash
           </button>
         </div>
 

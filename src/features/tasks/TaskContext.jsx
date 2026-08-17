@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, useEffect } from "react";
+import { useAuth } from "../auth/AuthContext";
 
 const TaskContext = createContext(null);
 const API_URL = "http://localhost:3001/tasks";
@@ -38,6 +39,15 @@ function taskReducer(state, action) {
 export function TaskProvider({ children }) {
   const [state, dispatch] = useReducer(taskReducer, initialState);
 
+  const { isExpired, logout } = useAuth();
+
+  const checkAuthOrFail = () => {
+    if (isExpired()) {
+      logout();
+      throw new Error("401: Session expired");
+    }
+  };
+
   useEffect(() => {
     fetch(API_URL)
       .then((res) => res.json())
@@ -52,6 +62,7 @@ export function TaskProvider({ children }) {
     dispatch({ type: "ADD_TASK", payload: optimisticTask });
 
     try {
+      checkAuthOrFail();
       const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -72,6 +83,7 @@ export function TaskProvider({ children }) {
     dispatch({ type: "DELETE_TASK", payload: id });
 
     try {
+      checkAuthOrFail();
       await fetch(`${API_URL}/${id}`, { method: "DELETE" });
     } catch (err) {
       dispatch({ type: "ADD_TASK", payload: taskToDelete });
@@ -84,6 +96,7 @@ export function TaskProvider({ children }) {
     dispatch({ type: "UPDATE_TASK", payload: updatedTask });
 
     try {
+      checkAuthOrFail();
       await fetch(`${API_URL}/${task.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -100,6 +113,7 @@ export function TaskProvider({ children }) {
     dispatch({ type: "UPDATE_TASK", payload: updatedTask });
 
     try {
+      checkAuthOrFail();
       await fetch(`${API_URL}/${task.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
