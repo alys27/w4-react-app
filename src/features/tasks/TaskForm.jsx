@@ -1,44 +1,39 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useTasks } from "./TaskContext";
 
 function TaskForm() {
-  const [title, setTitle] = useState("");
-  const [error, setError] = useState("");
   const { addTask } = useTasks();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const trimmedTitle = title.trim();
-
-    if (!trimmedTitle) {
-      setError("Task title cannot be empty");
-      return;
-    }
-    if (trimmedTitle.length < 3) {
-      setError("Task title must be at least 3 characters");
-      return;
-    }
-
-    addTask(trimmedTitle);
-    setTitle("");
-    setError("");
+  const onSubmit = (data) => {
+    addTask(data.title.trim());
+    reset();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="task-form">
+    <form onSubmit={handleSubmit(onSubmit)} className="task-form">
       <input
         type="text"
         placeholder="Enter task title"
-        value={title}
-        onChange={(e) => {
-          setTitle(e.target.value);
-          if (error) setError("");
-        }}
+        {...register("title", {
+          required: "Task title cannot be empty",
+          minLength: {
+            value: 3,
+            message: "Task title must be at least 3 characters",
+          },
+          validate: (value) =>
+            value.trim().length > 0 || "Task title cannot be empty",
+        })}
       />
       <button type="submit" className="btn-primary" style={{ width: "auto" }}>
         Add
       </button>
-      {error && <p className="error-text">{error}</p>}
+      {errors.title && <p className="error-text">{errors.title.message}</p>}
     </form>
   );
 }
