@@ -60,4 +60,6 @@ Tətbiq `http://localhost:5173` ünvanında açılacaq, mock API isə `http://lo
 
 Layihə checkpoint-lər üzrə addım-addım, ardıcıl commit-lərlə qurulub: əvvəlcə React Router ilə qorunan marşrutlar quruldu — login olmadan `/dashboard`-a giriş cəhdi avtomatik `/login`-ə yönləndirilir. Ardından autentifikasiya axını əlavə olundu: login/logout, token `localStorage`-da saxlanılır ki, səhifə yenilənəndə istifadəçi sessiyadan çıxarılmasın, logout-dan sonra isə "Geri" düyməsi ilə qorunan səhifəyə qayıtmaq mümkün deyil. AuthContext daxilində mock token expiration (2 dəqiqə) taymeri quruldu — vaxt bitdikdə istifadəçi avtomatik logout edilir və `/login`-ə yönləndirilir; guest guard isə giriş etmiş istifadəçinin `/login`-ə təkrar keçməsinin qarşısını alır.
 
+Login üçün: test / test1234
+
 Növbəti mərhələdə `useReducer` ilə qlobal state idarəetməsi quruldu, üzərinə forma validasiyası (boş və ya çox qısa başlıqların qəbul edilməməsi) əlavə olundu. CRUD əməliyyatları (əlavə/yenilə/sil) **optimistic UI** məntiqi ilə `json-server` mock API-yə bağlandı — hər əməliyyat serverə sorğu tamamlanmadan UI-da dərhal əks olunur, sorğu uğursuz olduqda isə avtomatik geri qaytarılır (rollback). Mentor rəyinə əsasən, API sorğuları (`fetch`) `TaskContext`-dən ayrılaraq ayrıca `taskApi.js` faylına
